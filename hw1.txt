@@ -1,0 +1,17 @@
+1) Найти топ 7 директорий на сервере, которые занимают больше всего памяти и записать в файл
+
+sudo du -h /* | sort -hr | grep -v "cannot access" | head -n 7 | nl >> hw1.txt
+
+     1	6.2G	/snap
+     2	6.0G	/usr
+     3	4.9G	/var
+     4	4.5G	/usr/lib
+     5	4.0G	/var/lib
+     6	3.6G	/var/lib/snapd
+     7	2.5G	/snap/gnome-42-2204
+
+2) Создать пользователя и добавить в группу  
+
+sudo useradd homework -g sudo
+
+uid=1002(homework) gid=27(sudo) groups=27(sudo)
