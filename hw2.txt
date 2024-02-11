@@ -1,0 +1,69 @@
+1) Написать скрипт, если в файле есть слово "error", тогда удалить этот файл.
+
+#!/bin/bash
+
+if [ "$(find . -name "*error*")" ]
+then
+rm *error* && echo "Файлы с error в наименовании успешно удалены"
+else
+echo "Файлов с error в наименовании не найдено"
+fi
+
+
+2) Написать скрипт, который будет создавать пользователя, имя пользователя должно вводится с клавиатуры.
+Если пользователь существует, то вывести сообщение об этом.
+
+#!/bin/bash
+
+read -p 'Введите имя создаваемого пользователя: ' user
+
+if [ "$(cat /etc/passwd | grep $user)" ]
+then
+echo "Указанный пользователь уже существует"
+else
+useradd $user && echo "Пользователь $user успешно создан"
+fi
+
+
+
+3) Написать любой сервис в линуксе.
+
+cat /lib/systemd/system/homework.service
+
+[Unit]
+Description=homework
+[Service]
+ExecStart=/home/petrovich/homework2/3.sh
+[Install]
+WantedBy=multi-user.target
+
+cat /home/petrovich/homework2/3.sh
+
+#!/bin/bash
+
+echo "Service worked" >> /home/petrovich/homework2/service.txt
+
+sleep 60
+
+sudo systemctl start homework && sudo systemctl status homework
+
+
+● homework.service - homework
+     Loaded: loaded (/lib/systemd/system/homework.service; enabled; vendor preset: enabled)
+     Active: active (running) since Sun 2024-02-11 13:28:50 EST; 37ms ago
+   Main PID: 33269 (3.sh)
+      Tasks: 2 (limit: 19084)
+     Memory: 532.0K
+        CPU: 6ms
+     CGroup: /system.slice/homework.service
+             ├─33269 /bin/bash /home/petrovich/homework2/3.sh
+             └─33270 sleep 60
+
+Feb 11 13:28:50 petrovich-virtual-machine systemd[1]: Started homework.
+
+cat service.txt
+
+
+Service worked
+
+
