@@ -1,0 +1,74 @@
+2. Создать свой любой имадж(использовать Dockerfile) и запушить имадж в свой репозиторий в Dockerhub.
+
+/home/homework5 $ cat Dockerfile
+
+FROM python:3.8-slim
+
+RUN pip install flask
+
+COPY app.py /home/app/app.py
+
+WORKDIR /home/app
+
+CMD ["python", "app.py"]
+
+/home/homework5 $ cat app.py
+
+#!/usr/bin python3
+# Импортируем библиотеку random для генерации случайных чисел
+import random
+
+# Функция для проведения теста
+def devops_test():
+    questions = [
+        "Вы любите автоматизировать рутинные задачи?",
+        "У вас есть опыт работы с облачными сервисами (например, AWS, Azure, GCP)?",
+        "Вы умеете писать скрипты на Python или других языках программирования?",
+        "Вы готовы изучать новые технологии и инструменты?",
+        "Вы обладаете навыками работы с системами контроля версий (например, Git)?"
+    ]
+
+    # Переменная для отслеживания ответа пользователя
+    suitable = True
+    score = 0
+
+    # Выводим каждый вопрос и просим пользователя ответить 'да' или 'нет'
+    for idx, question in enumerate(questions, start=1):
+        answer = input(f"Вопрос {idx}: {question} (да/нет) ")
+        if answer.lower() == 'да':
+            score += 20
+        elif answer.lower() != 'нет':
+            print("Пожалуйста, ответьте 'да' или 'нет'.")
+            return
+
+    print("Ваш результат:")
+    print(f"- {score}% подходит профессия DevOps.")
+    if score == 100:
+        print("Вы ответили 'да' на все вопросы. Возможно, профессия DevOps вам идеально подходит!")
+
+# Запускаем тест
+devops_test()
+
+sudo docker build -t dockerdevops .
+
+sudo docker tag dockerdevops:latest petrovichpower/dockerdevops:latest
+
+sudo docker push petrovichpower/dockerdevops:latest
+
+sudo docker pull petrovichpower/dockerdevops
+
+sudo docker run -it f3e bash
+
+root@90399b2293cf:/home/app# ls
+app.py
+
+root@90399b2293cf:/home/app# python3 app.py
+Вопрос 1: Вы любите автоматизировать рутинные задачи? (да/нет) да
+Вопрос 2: У вас есть опыт работы с облачными сервисами (например, AWS, Azure, GCP)? (да/нет) да
+Вопрос 3: Вы умеете писать скрипты на Python или других языках программирования? (да/нет) да
+Вопрос 4: Вы готовы изучать новые технологии и инструменты? (да/нет) да
+Вопрос 5: Вы обладаете навыками работы с системами контроля версий (например, Git)? (да/нет) да
+Ваш результат:
+- 100% подходит профессия DevOps.
+Вы ответили 'да' на все вопросы. Возможно, профессия DevOps вам идеально подходит!
+
