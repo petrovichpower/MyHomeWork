@@ -1,0 +1,42 @@
+2. Создать Job, она должна уметь разворачивать ELK stack на другом slave любым способом. Если не хватает ресурсов, тогда развернуть только Elasticsearch.
+
+pipeline {
+    agent { label 'slave-node' }
+
+    stages {
+        stage('Install Elasticsearch from Local .deb File') {
+            steps {
+                script {
+                    withCredentials([string(credentialsId: 'PASSWORD', variable: 'SUDO_PASSWORD')]) {
+                        sh '''
+                            echo $SUDO_PASSWORD | sudo -S dpkg -i /var/lib/jenkins/elastic/elasticsearch-8.12.2-amd64.deb
+                            echo $SUDO_PASSWORD | sudo -S apt-get install -f
+                            echo $SUDO_PASSWORD | sudo -S systemctl enable elasticsearch
+                            echo $SUDO_PASSWORD | sudo -S systemctl start elasticsearch
+                        '''
+                    }
+                }
+            }
+        }
+    }
+}
+
+
+
++ echo ****
++ sudo -S dpkg -i /var/lib/jenkins/elastic/elasticsearch-8.12.2-amd64.deb
+[sudo] password for jenkins: (Reading database ... 255672 files and directories currently installed.)
+Preparing to unpack .../elasticsearch-8.12.2-amd64.deb ...
+Unpacking elasticsearch (8.12.2) over (8.12.2) ...
+Setting up elasticsearch (8.12.2) ...
++ echo ****
++ sudo -S apt-get install -f
+Reading package lists...
+Building dependency tree...
+Reading state information...
+0 upgraded, 0 newly installed, 0 to remove and 32 not upgraded.
++ echo ****
++ sudo -S systemctl enable elasticsearch
+Created symlink /etc/systemd/system/multi-user.target.wants/elasticsearch.service → /lib/systemd/system/elasticsearch.service.
++ echo ****
++ sudo -S systemctl start elasticsearch
