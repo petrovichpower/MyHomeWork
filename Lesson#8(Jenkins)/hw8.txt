@@ -1,0 +1,157 @@
+1. Подключить Windows Slave к Jenkins.
+
+  PS Z:\> curl.exe -sO http://172.16.0.130:8080/jnlpJars/agent.jar
+PS Z:\> java -jar agent.jar -url http://172.16.0.130:8080/ -secret 65f4b5822e36dd3ea8daff1305e9fd66e9296f59aca1b79d6c31d17939a61b77 -name "windows-slave" -workDir "C:\jenkins"
+мар. 04, 2024 9:37:36 PM org.jenkinsci.remoting.engine.WorkDirManager initializeWorkDir
+INFO: Using C:\jenkins\remoting as a remoting work directory
+мар. 04, 2024 9:37:37 PM org.jenkinsci.remoting.engine.WorkDirManager setupLogging
+INFO: Both error and output logs will be printed to C:\jenkins\remoting
+мар. 04, 2024 9:37:37 PM hudson.remoting.Launcher createEngine
+INFO: Setting up agent: windows-slave
+мар. 04, 2024 9:37:37 PM hudson.remoting.Engine startEngine
+INFO: Using Remoting version: 3206.vb_15dcf73f6a_9
+мар. 04, 2024 9:37:37 PM org.jenkinsci.remoting.engine.WorkDirManager initializeWorkDir
+INFO: Using C:\jenkins\remoting as a remoting work directory
+мар. 04, 2024 9:37:37 PM hudson.remoting.Launcher$CuiListener status
+INFO: Locating server among [http://172.16.0.130:8080/]
+мар. 04, 2024 9:37:37 PM org.jenkinsci.remoting.engine.JnlpAgentEndpointResolver resolve
+INFO: Remoting server accepts the following protocols: [JNLP4-connect, Ping]
+мар. 04, 2024 9:37:37 PM hudson.remoting.Launcher$CuiListener status
+INFO: Agent discovery successful
+  Agent address: 172.16.0.130
+  Agent port:    34425
+  Identity:      ed:c4:e1:6b:9f:70:fd:e3:c5:d3:79:53:e0:39:46:11
+мар. 04, 2024 9:37:37 PM hudson.remoting.Launcher$CuiListener status
+INFO: Handshaking
+мар. 04, 2024 9:37:37 PM hudson.remoting.Launcher$CuiListener status
+INFO: Connecting to 172.16.0.130:34425
+мар. 04, 2024 9:37:37 PM hudson.remoting.Launcher$CuiListener status
+INFO: Server reports protocol JNLP4-connect-proxy not supported, skipping
+мар. 04, 2024 9:37:37 PM hudson.remoting.Launcher$CuiListener status
+INFO: Trying protocol: JNLP4-connect
+мар. 04, 2024 9:37:37 PM org.jenkinsci.remoting.protocol.impl.BIONetworkLayer$Reader run
+INFO: Waiting for ProtocolStack to start.
+мар. 04, 2024 9:37:37 PM hudson.remoting.Launcher$CuiListener status
+INFO: Remote identity confirmed: ed:c4:e1:6b:9f:70:fd:e3:c5:d3:79:53:e0:39:46:11
+мар. 04, 2024 9:37:37 PM hudson.remoting.Launcher$CuiListener status
+INFO: Connected
+
+2. Создать джобу, которая запустит на новом слейве любой bat скрипт.
+
+pipeline {
+    agent {
+        label 'windows-slave'
+    }
+    
+    stages {
+        stage('Run Bat File') {
+            steps {
+                bat script: 'C:\\jenkins\\0.bat'
+            }
+        }
+    }
+}
+
+Started by user Петрович А.Д.
+[Pipeline] Start of Pipeline
+[Pipeline] node
+Running on windows-slave in C:\jenkins\workspace\homework8
+[Pipeline] {
+[Pipeline] stage
+[Pipeline] { (Run Bat File)
+[Pipeline] bat
+
+C:\jenkins\workspace\homework8>C:\jenkins\0.bat
+
+C:\jenkins\workspace\homework8>REM Устанавливаем кодировку UTF-8 
+
+C:\jenkins\workspace\homework8>chcp 65001  1>nul 
+
+C:\jenkins\workspace\homework8>REM Устанавливаем дату окончания курса 
+
+C:\jenkins\workspace\homework8>set end_date=30.04.2024 
+
+C:\jenkins\workspace\homework8>set end_time=21:30 
+
+C:\jenkins\workspace\homework8>REM Получаем текущую дату и время 
+
+C:\jenkins\workspace\homework8>for /F "tokens=1-3 delims=.-/ " %a in ("04.03.2024") do (
+set /a current_day=%a  
+ set /a current_month=%b  
+ set /a current_year=%c 
+) 
+
+C:\jenkins\workspace\homework8>(
+set /a current_day=04  
+ set /a current_month=03  
+ set /a current_year=2024 
+) 
+
+C:\jenkins\workspace\homework8>for /F "tokens=1-2 delims=:" %a in ("22:40:11,12") do (
+set /a current_hour=%a  
+ set /a current_minute=%b 
+) 
+
+C:\jenkins\workspace\homework8>(
+set /a current_hour=22  
+ set /a current_minute=40 
+) 
+
+C:\jenkins\workspace\homework8>REM Получаем дату окончания курса 
+
+C:\jenkins\workspace\homework8>for /F "tokens=1-3 delims=.-/ " %a in ("30.04.2024") do (
+set /a end_day=%a  
+ set /a end_month=%b  
+ set /a end_year=%c 
+) 
+
+C:\jenkins\workspace\homework8>(
+set /a end_day=30  
+ set /a end_month=04  
+ set /a end_year=2024 
+) 
+
+C:\jenkins\workspace\homework8>for /F "tokens=1-2 delims=:" %a in ("21:30") do (
+set /a end_hour=%a  
+ set /a end_minute=%b 
+) 
+
+C:\jenkins\workspace\homework8>(
+set /a end_hour=21  
+ set /a end_minute=30 
+) 
+
+C:\jenkins\workspace\homework8>REM Вычисляем оставшееся время до окончания курса 
+
+C:\jenkins\workspace\homework8>set /a total_days=(end_year-current_year)*365 + (end_month-current_month)*30 + (end_day-current_day) 
+
+C:\jenkins\workspace\homework8>set /a total_hours=(end_hour-current_hour) 
+
+C:\jenkins\workspace\homework8>if -1 LSS 0 (
+set /a total_days-=1  
+ set /a total_hours+=24 
+) 
+
+C:\jenkins\workspace\homework8>set /a total_minutes=(end_minute-current_minute) 
+
+C:\jenkins\workspace\homework8>if -10 LSS 0 (
+set /a total_hours-=1  
+ set /a total_minutes+=60 
+) 
+
+C:\jenkins\workspace\homework8>REM Выводим результат 
+
+C:\jenkins\workspace\homework8>echo Осталось времени до окончания курса: 
+Осталось времени до окончания курса:
+
+C:\jenkins\workspace\homework8>echo 55 дней, 22 часов, 50 минут 
+55 дней, 22 часов, 50 минут
+
+C:\jenkins\workspace\homework8>pause
+Press any key to continue . . . 
+[Pipeline] }
+[Pipeline] // stage
+[Pipeline] }
+[Pipeline] // node
+[Pipeline] End of Pipeline
+Finished: SUCCESS
