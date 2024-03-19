@@ -1,0 +1,168 @@
+AWSTemplateFormatVersion: '2010-09-09'
+Resources:
+  VPC1Petrovich:
+    Type: 'AWS::EC2::VPC'
+    Properties:
+      CidrBlock: '10.0.0.0/24'
+      EnableDnsSupport: 'true'
+      EnableDnsHostnames: 'true'
+
+  MyTransitGatewayAttachment1:
+    Type: "AWS::EC2::TransitGatewayAttachment"
+    Properties:
+      TransitGatewayId: "tgw-0c16b58c0288123e7"  
+      VpcId: !Ref VPC1Petrovich           
+      SubnetIds: 
+        - !Ref Subnet1Petrovich
+  MyTransitGatewayAttachment2:
+    Type: "AWS::EC2::TransitGatewayAttachment"
+    Properties:
+      TransitGatewayId: "tgw-0c16b58c0288123e7"  
+      VpcId: !Ref VPC2Petrovich           
+      SubnetIds: 
+        - !Ref Subnet2Petrovich
+
+
+  VPC2Petrovich:
+    Type: 'AWS::EC2::VPC'
+    Properties:
+      CidrBlock: '172.16.0.0/24'
+      EnableDnsSupport: 'true'
+      EnableDnsHostnames: 'true'
+
+  VPC1InternetGatewayPetrovich:
+    Type: 'AWS::EC2::InternetGateway'
+
+  AttachGateway1Petrovich:
+    Type: 'AWS::EC2::VPCGatewayAttachment'
+    Properties:
+      VpcId: !Ref VPC1Petrovich
+      InternetGatewayId: !Ref VPC1InternetGatewayPetrovich
+
+
+  RouteToInternet1Petrovich:
+    Type: 'AWS::EC2::Route'
+    DependsOn: AttachGateway1Petrovich
+    Properties:
+      RouteTableId: !Ref RouteTableVPC1
+      DestinationCidrBlock: '0.0.0.0/0'
+      GatewayId: !Ref VPC1InternetGatewayPetrovich
+
+  Subnet1Petrovich:
+    Type: 'AWS::EC2::Subnet'
+    Properties:
+      VpcId: !Ref VPC1Petrovich
+      CidrBlock: '10.0.0.0/24'
+      AvailabilityZone: 'us-east-1a'
+
+  SecurityGroup1Petrovich:
+    Type: 'AWS::EC2::SecurityGroup'
+    Properties:
+      GroupDescription: 'Security Group for Instance in VPC1 Petrovich'
+      VpcId: !Ref VPC1Petrovich
+      SecurityGroupIngress:
+        - CidrIp: '86.57.156.230/32'
+          IpProtocol: 'tcp'
+          FromPort: '22'
+          ToPort: '22'
+
+  Instance1Petrovich:
+    Type: 'AWS::EC2::Instance'
+    Properties:
+      ImageId: 'ami-09a48b1b59d350f28'
+      InstanceType: 't2.micro'
+      KeyName: 'devops'
+      NetworkInterfaces:
+        - AssociatePublicIpAddress: 'true'
+          DeviceIndex: '0'
+          SubnetId: !Ref Subnet1Petrovich
+          GroupSet:
+            - !Ref SecurityGroup1Petrovich
+
+  VPC2InternetGatewayPetrovich:
+    Type: 'AWS::EC2::InternetGateway'
+
+  AttachGateway2Petrovich:
+    Type: 'AWS::EC2::VPCGatewayAttachment'
+    Properties:
+      VpcId: !Ref VPC2Petrovich
+      InternetGatewayId: !Ref VPC2InternetGatewayPetrovich
+
+
+  RouteToInternet2Petrovich:
+    Type: 'AWS::EC2::Route'
+    Properties:
+      RouteTableId: !Ref RouteTableVPC2
+      DestinationCidrBlock: '0.0.0.0/0'
+      GatewayId: !Ref VPC2InternetGatewayPetrovich
+
+  Subnet2Petrovich:
+    Type: 'AWS::EC2::Subnet'
+    Properties:
+      VpcId: !Ref VPC2Petrovich
+      CidrBlock: '172.16.0.0/24'
+      AvailabilityZone: 'us-east-1b'
+
+  SecurityGroup2Petrovich:
+    Type: 'AWS::EC2::SecurityGroup'
+    Properties:
+      GroupDescription: 'Security Group for Instance in VPC2 Petrovich'
+      VpcId: !Ref VPC2Petrovich
+      SecurityGroupIngress:
+        - CidrIp: '10.0.0.0/24'
+          IpProtocol: 'tcp'
+          FromPort: '22'
+          ToPort: '22'
+
+  Instance2Petrovich:
+    Type: 'AWS::EC2::Instance'
+    Properties:
+      ImageId: 'ami-09a48b1b59d350f28'
+      InstanceType: 't2.micro'
+      KeyName: 'devops'
+      NetworkInterfaces:
+        - DeviceIndex: '0'
+          SubnetId: !Ref Subnet2Petrovich
+          GroupSet:
+            - !Ref SecurityGroup2Petrovich
+            
+            # Настройка маршрутов в первой VPC
+  RouteTableVPC1:
+    Type: "AWS::EC2::RouteTable"
+    Properties:
+      VpcId: !Ref VPC1Petrovich 
+  RouteToTransitGatewayVPC1:
+    Type: "AWS::EC2::Route"
+    Properties:
+      RouteTableId: !Ref RouteTableVPC1
+      DestinationCidrBlock: "172.16.0.0/24" 
+      TransitGatewayId: "tgw-0c16b58c0288123e7"
+
+  # Настройка маршрутов во второй VPC
+  RouteTableVPC2:
+    Type: "AWS::EC2::RouteTable"
+    Properties:
+      VpcId: !Ref VPC2Petrovich   
+  RouteToTransitGatewayVPC2:
+    Type: "AWS::EC2::Route"
+    Properties:
+      RouteTableId: !Ref RouteTableVPC2
+      DestinationCidrBlock: "10.0.0.0/24"  
+      TransitGatewayId: "tgw-0c16b58c0288123e7" 
+      
+  TransitGatewayRouteTable:
+    Type: "AWS::EC2::TransitGatewayRouteTable"
+    Properties:
+      TransitGatewayId: "tgw-0c16b58c0288123e7" 
+  RouteToVPC1:
+    Type: "AWS::EC2::TransitGatewayRoute"
+    Properties:
+      TransitGatewayRouteTableId: !Ref TransitGatewayRouteTable
+      DestinationCidrBlock: "10.0.0.0/24"  
+      TransitGatewayAttachmentId: !Ref MyTransitGatewayAttachment1  
+  RouteToVPC2:
+    Type: "AWS::EC2::TransitGatewayRoute"
+    Properties:
+      TransitGatewayRouteTableId: !Ref TransitGatewayRouteTable
+      DestinationCidrBlock: "172.16.0.0/24"  
+      TransitGatewayAttachmentId: !Ref MyTransitGatewayAttachment2  
