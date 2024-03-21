@@ -67,5 +67,18 @@ output "instance_id" {
   value = aws_instance.petrovich_instance.id
 }
 
+Apply complete! Resources: 1 added, 0 changed, 0 destroyed.
+
+Outputs:
+
+instance_id = "i-02880463c1d4f2846"
 
 
+
+3) Через data найти любую созданную SG.
+
+Apply complete! Resources: 0 added, 0 changed, 4 destroyed.
+
+Outputs:
+
+found_security_group_id = "sg-02bed5840a3b6210f"
