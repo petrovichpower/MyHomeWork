@@ -1,0 +1,385 @@
+1.	С помощью terraform развернуть два VPC в двух environment используя workspaces.
+
+main.tf
+
+provider "aws" {
+  region = var.region
+}
+
+variable "region" {
+  type    = string
+}
+
+variable "environment_dev" {
+  type    = string
+}
+
+variable "environment_prod" {
+  type    = string
+}
+
+variable "cidr_block_dev" {
+  type    = string
+}
+
+variable "cidr_block_prod" {
+  type    = string
+}
+
+resource "aws_vpc" "petrovich_dev" {
+  count = var.environment_dev == "dev" ? 1 : 0
+  cidr_block = var.cidr_block_dev
+  tags = {
+    Name = var.environment_dev == "dev" ? "petrovich-dev-vpc" : "petrovich-dev-vpc"
+  }
+}
+
+resource "aws_vpc" "petrovich_prod" {
+  count = var.environment_prod == "prod" ? 1 : 0
+  cidr_block = var.cidr_block_prod
+  tags = {
+    Name = var.environment_prod == "prod" ? "petrovich-prod-vpc" : "petrovich-prod-vpc"
+  }
+}
+
+terraform.tfvars
+
+region = "us-east-1"
+environment_dev = "dev"
+environment_prod = "prod"
+cidr_block_dev = "10.0.0.0/24"
+cidr_block_prod = "172.16.0.0/24"
+
+terraform plan
+
+Terraform used the selected providers to generate the following execution plan. Resource actions are indicated with the
+following symbols:
+  + create
+
+Terraform will perform the following actions:
+
+  # aws_vpc.petrovich_dev[0] will be created
+  + resource "aws_vpc" "petrovich_dev" {
+      + arn                                  = (known after apply)
+      + cidr_block                           = "10.0.0.0/24"
+      + default_network_acl_id               = (known after apply)
+      + default_route_table_id               = (known after apply)
+      + default_security_group_id            = (known after apply)
+      + dhcp_options_id                      = (known after apply)
+      + enable_dns_hostnames                 = (known after apply)
+      + enable_dns_support                   = true
+      + enable_network_address_usage_metrics = (known after apply)
+      + id                                   = (known after apply)
+      + instance_tenancy                     = "default"
+      + ipv6_association_id                  = (known after apply)
+      + ipv6_cidr_block                      = (known after apply)
+      + ipv6_cidr_block_network_border_group = (known after apply)
+      + main_route_table_id                  = (known after apply)
+      + owner_id                             = (known after apply)
+      + tags                                 = {
+          + "Name" = "petrovich-dev-vpc"
+        }
+      + tags_all                             = {
+          + "Name" = "petrovich-dev-vpc"
+        }
+    }
+
+  # aws_vpc.petrovich_prod[0] will be created
+  + resource "aws_vpc" "petrovich_prod" {
+      + arn                                  = (known after apply)
+      + cidr_block                           = "172.16.0.0/24"
+      + default_network_acl_id               = (known after apply)
+      + default_route_table_id               = (known after apply)
+      + default_security_group_id            = (known after apply)
+      + dhcp_options_id                      = (known after apply)
+      + enable_dns_hostnames                 = (known after apply)
+      + enable_dns_support                   = true
+      + enable_network_address_usage_metrics = (known after apply)
+      + id                                   = (known after apply)
+      + instance_tenancy                     = "default"
+      + ipv6_association_id                  = (known after apply)
+      + ipv6_cidr_block                      = (known after apply)
+      + ipv6_cidr_block_network_border_group = (known after apply)
+      + main_route_table_id                  = (known after apply)
+      + owner_id                             = (known after apply)
+      + tags                                 = {
+          + "Name" = "petrovich-prod-vpc"
+        }
+      + tags_all                             = {
+          + "Name" = "petrovich-prod-vpc"
+        }
+    }
+
+Plan: 2 to add, 0 to change, 0 to destroy.
+
+───────────────────────────────────────────────────────────────────────────────────────────────────────────────────────
+
+Note: You didn't use the -out option to save this plan, so Terraform can't guarantee to take exactly these actions if
+you run "terraform apply" now.
+
+C:\terraform>terraform apply
+
+Terraform used the selected providers to generate the following execution plan. Resource actions are indicated with the
+following symbols:
+  + create
+
+Terraform will perform the following actions:
+
+  # aws_vpc.petrovich_dev[0] will be created
+  + resource "aws_vpc" "petrovich_dev" {
+      + arn                                  = (known after apply)
+      + cidr_block                           = "10.0.0.0/24"
+      + default_network_acl_id               = (known after apply)
+      + default_route_table_id               = (known after apply)
+      + default_security_group_id            = (known after apply)
+      + dhcp_options_id                      = (known after apply)
+      + enable_dns_hostnames                 = (known after apply)
+      + enable_dns_support                   = true
+      + enable_network_address_usage_metrics = (known after apply)
+      + id                                   = (known after apply)
+      + instance_tenancy                     = "default"
+      + ipv6_association_id                  = (known after apply)
+      + ipv6_cidr_block                      = (known after apply)
+      + ipv6_cidr_block_network_border_group = (known after apply)
+      + main_route_table_id                  = (known after apply)
+      + owner_id                             = (known after apply)
+      + tags                                 = {
+          + "Name" = "petrovich-dev-vpc"
+        }
+      + tags_all                             = {
+          + "Name" = "petrovich-dev-vpc"
+        }
+    }
+
+  # aws_vpc.petrovich_prod[0] will be created
+  + resource "aws_vpc" "petrovich_prod" {
+      + arn                                  = (known after apply)
+      + cidr_block                           = "172.16.0.0/24"
+      + default_network_acl_id               = (known after apply)
+      + default_route_table_id               = (known after apply)
+      + default_security_group_id            = (known after apply)
+      + dhcp_options_id                      = (known after apply)
+      + enable_dns_hostnames                 = (known after apply)
+      + enable_dns_support                   = true
+      + enable_network_address_usage_metrics = (known after apply)
+      + id                                   = (known after apply)
+      + instance_tenancy                     = "default"
+      + ipv6_association_id                  = (known after apply)
+      + ipv6_cidr_block                      = (known after apply)
+      + ipv6_cidr_block_network_border_group = (known after apply)
+      + main_route_table_id                  = (known after apply)
+      + owner_id                             = (known after apply)
+      + tags                                 = {
+          + "Name" = "petrovich-prod-vpc"
+        }
+      + tags_all                             = {
+          + "Name" = "petrovich-prod-vpc"
+        }
+    }
+
+Plan: 2 to add, 0 to change, 0 to destroy.
+
+Do you want to perform these actions?
+  Terraform will perform the actions described above.
+  Only 'yes' will be accepted to approve.
+
+  Enter a value: yes
+
+aws_vpc.petrovich_dev[0]: Creating...
+aws_vpc.petrovich_prod[0]: Creating...
+aws_vpc.petrovich_prod[0]: Creation complete after 4s [id=vpc-0240351928bf0e260]
+aws_vpc.petrovich_dev[0]: Creation complete after 4s [id=vpc-0873416e6b4a09735]
+
+Apply complete! Resources: 2 added, 0 changed, 0 destroyed.
+
+
+
+2.	Создать RDS и прикрепить пароль с помощью random_password, пароль должен хранится в parameter store.
+
+main.tf
+
+provider "aws" {
+  region = var.region
+}
+
+variable "region" {
+  type = string
+}
+
+variable "db_password_length" {
+  type    = number
+  default = 16
+}
+
+resource "random_password" "db_password" {
+  length           = var.db_password_length
+  special          = true
+  override_special = "_%"
+}
+
+resource "aws_db_instance" "mydb" {
+  identifier            = "mydbinstance"
+  allocated_storage     = 20
+  storage_type          = "gp2"
+  engine                = "mysql"
+  engine_version        = "8.0.35"
+  instance_class        = "db.t3.micro"
+  username              = "admin"
+  password              = random_password.db_password.result
+}
+
+resource "aws_ssm_parameter" "db_password_param" {
+  name  = "/myapp/db_password"
+  type  = "SecureString"
+  value = random_password.db_password.result
+}
+
+terraform.tfvars
+
+region = "us-east-1"
+db_password_length = "16"
+
+terraform apply
+random_password.db_password: Refreshing state... [id=none]
+aws_ssm_parameter.db_password_param: Refreshing state... [id=/myapp/db_password]
+
+Terraform used the selected providers to generate the following execution plan. Resource actions are indicated with the
+following symbols:
+  + create
+  ~ update in-place
+-/+ destroy and then create replacement
+
+Terraform will perform the following actions:
+
+  # aws_db_instance.mydb will be created
+  + resource "aws_db_instance" "mydb" {
+      + address                               = (known after apply)
+      + allocated_storage                     = 20
+      + apply_immediately                     = false
+      + arn                                   = (known after apply)
+      + auto_minor_version_upgrade            = true
+      + availability_zone                     = (known after apply)
+      + backup_retention_period               = (known after apply)
+      + backup_target                         = (known after apply)
+      + backup_window                         = (known after apply)
+      + ca_cert_identifier                    = (known after apply)
+      + character_set_name                    = (known after apply)
+      + copy_tags_to_snapshot                 = false
+      + db_name                               = (known after apply)
+      + db_subnet_group_name                  = (known after apply)
+      + delete_automated_backups              = true
+      + domain_fqdn                           = (known after apply)
+      + endpoint                              = (known after apply)
+      + engine                                = "mysql"
+      + engine_version                        = "8.0.35"
+      + engine_version_actual                 = (known after apply)
+      + hosted_zone_id                        = (known after apply)
+      + id                                    = (known after apply)
+      + identifier                            = "mydbinstance"
+      + identifier_prefix                     = (known after apply)
+      + instance_class                        = "db.t3.micro"
+      + iops                                  = (known after apply)
+      + kms_key_id                            = (known after apply)
+      + latest_restorable_time                = (known after apply)
+      + license_model                         = (known after apply)
+      + listener_endpoint                     = (known after apply)
+      + maintenance_window                    = (known after apply)
+      + master_user_secret                    = (known after apply)
+      + master_user_secret_kms_key_id         = (known after apply)
+      + monitoring_interval                   = 0
+      + monitoring_role_arn                   = (known after apply)
+      + multi_az                              = (known after apply)
+      + nchar_character_set_name              = (known after apply)
+      + network_type                          = (known after apply)
+      + option_group_name                     = (known after apply)
+      + parameter_group_name                  = (known after apply)
+      + password                              = (sensitive value)
+      + performance_insights_enabled          = false
+      + performance_insights_kms_key_id       = (known after apply)
+      + performance_insights_retention_period = (known after apply)
+      + port                                  = (known after apply)
+      + publicly_accessible                   = false
+      + replica_mode                          = (known after apply)
+      + replicas                              = (known after apply)
+      + resource_id                           = (known after apply)
+      + skip_final_snapshot                   = false
+      + snapshot_identifier                   = (known after apply)
+      + status                                = (known after apply)
+      + storage_throughput                    = (known after apply)
+      + storage_type                          = "gp2"
+      + tags_all                              = (known after apply)
+      + timezone                              = (known after apply)
+      + username                              = "admin"
+      + vpc_security_group_ids                = (known after apply)
+    }
+
+  # aws_ssm_parameter.db_password_param will be updated in-place
+  ~ resource "aws_ssm_parameter" "db_password_param" {
+        id             = "/myapp/db_password"
+      + insecure_value = (known after apply)
+        name           = "/myapp/db_password"
+        tags           = {}
+      ~ value          = (sensitive value)
+      ~ version        = 1 -> (known after apply)
+        # (6 unchanged attributes hidden)
+    }
+
+  # random_password.db_password must be replaced
+-/+ resource "random_password" "db_password" {
+      ~ bcrypt_hash      = (sensitive value)
+      ~ id               = "none" -> (known after apply)
+      ~ override_special = "_%@" -> "_%" # forces replacement
+      ~ result           = (sensitive value)
+        # (10 unchanged attributes hidden)
+    }
+
+Plan: 2 to add, 1 to change, 1 to destroy.
+
+Do you want to perform these actions?
+  Terraform will perform the actions described above.
+  Only 'yes' will be accepted to approve.
+
+  Enter a value: yes
+
+random_password.db_password: Destroying... [id=none]
+random_password.db_password: Destruction complete after 0s
+random_password.db_password: Creating...
+random_password.db_password: Creation complete after 0s [id=none]
+aws_ssm_parameter.db_password_param: Modifying... [id=/myapp/db_password]
+aws_db_instance.mydb: Creating...
+aws_ssm_parameter.db_password_param: Modifications complete after 1s [id=/myapp/db_password]
+aws_db_instance.mydb: Still creating... [10s elapsed]
+aws_db_instance.mydb: Still creating... [20s elapsed]
+aws_db_instance.mydb: Still creating... [30s elapsed]
+aws_db_instance.mydb: Still creating... [40s elapsed]
+aws_db_instance.mydb: Still creating... [50s elapsed]
+aws_db_instance.mydb: Still creating... [1m0s elapsed]
+aws_db_instance.mydb: Still creating... [1m10s elapsed]
+aws_db_instance.mydb: Still creating... [1m20s elapsed]
+aws_db_instance.mydb: Still creating... [1m30s elapsed]
+aws_db_instance.mydb: Still creating... [1m40s elapsed]
+aws_db_instance.mydb: Still creating... [1m50s elapsed]
+aws_db_instance.mydb: Still creating... [2m0s elapsed]
+aws_db_instance.mydb: Still creating... [2m10s elapsed]
+aws_db_instance.mydb: Still creating... [2m20s elapsed]
+aws_db_instance.mydb: Still creating... [2m30s elapsed]
+aws_db_instance.mydb: Still creating... [2m40s elapsed]
+aws_db_instance.mydb: Still creating... [2m50s elapsed]
+aws_db_instance.mydb: Still creating... [3m0s elapsed]
+aws_db_instance.mydb: Still creating... [3m10s elapsed]
+aws_db_instance.mydb: Still creating... [3m20s elapsed]
+aws_db_instance.mydb: Still creating... [3m30s elapsed]
+aws_db_instance.mydb: Still creating... [3m40s elapsed]
+aws_db_instance.mydb: Still creating... [3m50s elapsed]
+aws_db_instance.mydb: Still creating... [4m0s elapsed]
+aws_db_instance.mydb: Still creating... [4m10s elapsed]
+aws_db_instance.mydb: Still creating... [4m20s elapsed]
+aws_db_instance.mydb: Still creating... [4m30s elapsed]
+aws_db_instance.mydb: Still creating... [4m40s elapsed]
+aws_db_instance.mydb: Still creating... [4m50s elapsed]
+aws_db_instance.mydb: Still creating... [5m0s elapsed]
+aws_db_instance.mydb: Still creating... [5m10s elapsed]
+aws_db_instance.mydb: Creation complete after 5m12s [id=db-NHLWKMT7SHSM4RJU2LXPL2MWRE]
+
+Apply complete! Resources: 2 added, 1 changed, 1 destroyed.
+
