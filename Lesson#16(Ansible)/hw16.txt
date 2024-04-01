@@ -1,0 +1,148 @@
+1. Написать ansible playbook, который скопирует файл с локального сервера на удаленный и удалит его.
+- name: cp file
+  hosts: hostname1
+  tasks:
+    - name: copy file from local server
+      ansible.builtin.copy:
+        src: /root/1.txt
+        dest: /root/testhw/1.txt
+        remote_src: yes
+
+    - name: del file from local server
+      ansible.builtin.file:
+        path: /root/testhw/1.txt
+        state: absent
+ansible-playbook -i hosts playbook.yml
+
+PLAY [cp file] ************************************************************************************************************
+
+TASK [Gathering Facts] ****************************************************************************************************
+ok: [hostname1]
+
+TASK [copy file from local server] ****************************************************************************************
+changed: [hostname1]
+
+TASK [del file from local server] *****************************************************************************************
+changed: [hostname1]
+
+PLAY RECAP ****************************************************************************************************************
+hostname1                  : ok=3    changed=2    unreachable=0    failed=0    skipped=0    rescued=0    ignored=0
+
+2. Написать ansible playboоk, который создаст пользователя с домашней директорией.
+
+- name: create user with home directory
+  hosts: hostname1
+  become: yes
+
+  tasks:
+    - name: create user
+      ansible.builtin.user:
+        name: hwuser
+        shell: /bin/bash
+        home: /home/hwuser
+        state: present
+
+    - name: create home directory
+      ansible.builtin.file:
+        path: /home/hwuser
+        state: directory
+        owner: hwuser
+        group: hwuser
+        mode: "0755"
+
+ansible-playbook -i hosts playbook.yml
+
+PLAY [create user with home directory] ************************************************************************************
+
+TASK [Gathering Facts] ****************************************************************************************************
+ok: [hostname1]
+
+TASK [create user] ********************************************************************************************************
+changed: [hostname1]
+
+TASK [create home directory] **********************************************************************************************
+changed: [hostname1]
+
+PLAY RECAP ****************************************************************************************************************
+hostname1                  : ok=3    changed=2    unreachable=0    failed=0    skipped=0    rescued=0    ignored=0
+
+cat /etc/passwd | grep hwuser
+hwuser:x:1004:1004::/home/hwuser:/bin/bash
+
+/home/hwuser# ll
+total 20
+drwxr-xr-x 2 hwuser hwuser 4096 Apr  1 23:43 ./
+drwxr-xr-x 8 root   root   4096 Apr  1 23:43 ../
+-rw-r--r-- 1 hwuser hwuser  220 Jan  6  2022 .bash_logout
+-rw-r--r-- 1 hwuser hwuser 3771 Jan  6  2022 .bashrc
+-rw-r--r-- 1 hwuser hwuser  807 Jan  6  2022 .profile
+root@petrovich-master:/home/hwuser#
+
+3. Написать ansible playbook, который установит докер и добавит в группу докер пользователя из второго задания.
+
+- name: install docker and adding user in docker group
+  hosts: hostname1
+  become: yes
+
+  tasks:
+    - name: install packages from https
+      ansible.builtin.package:
+        name: apt-transport-https, ca-certificates, curl, gnupg, lsb-release
+        state: present
+
+    - name: adding official key GPG Docker
+      ansible.builtin.apt_key:
+        url: https://download.docker.com/linux/ubuntu/gpg
+        state: present
+
+    - name: adding repository Docker
+      ansible.builtin.apt_repository:
+        repo: deb [arch=amd64] https://download.docker.com/linux/ubuntu focal stable
+        state: present
+
+    - name: install Docker
+      ansible.builtin.package:
+        name: docker-ce
+        state: present
+
+    - name: adding user in Docker group
+      ansible.builtin.user:
+        name: hwuser
+        groups: docker
+        append: yes
+
+
+ansible-playbook -i hosts playbook.yml
+
+PLAY [install docker and adding user in docker group] *********************************************************************
+
+TASK [Gathering Facts] ****************************************************************************************************
+ok: [hostname1]
+
+TASK [install packages from https] ****************************************************************************************
+ok: [hostname1]
+
+TASK [adding official key GPG Docker] *************************************************************************************
+ok: [hostname1]
+
+TASK [adding repository Docker] *******************************************************************************************
+ok: [hostname1]
+
+TASK [install Docker] *****************************************************************************************************
+ok: [hostname1]
+
+TASK [adding user in Docker group] ****************************************************************************************
+ok: [hostname1]
+
+PLAY RECAP ****************************************************************************************************************
+hostname1                  : ok=6    changed=0    unreachable=0    failed=0    skipped=0    rescued=0    ignored=0
+
+
+● docker.service - Docker Application Container Engine
+     Loaded: loaded (/lib/systemd/system/docker.service; disabled; vendor preset: enabled)
+     Active: active (running) since Tue 2024-04-02 00:13:01 +03; 4s ago
+
+ id hwuser
+uid=1004(hwuser) gid=1004(hwuser) groups=1004(hwuser),138(docker)
+
+
