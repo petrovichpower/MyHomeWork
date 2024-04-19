@@ -1,0 +1,111 @@
+1. Создать ес2 t2.micro с помощью ansible playbook.
+2. Запустить там докер контейнер.
+3. Удалить этот инстанс.
+
+Использовать один playbook.
+
+- name: hw17 create ec2, run docker, delete instance
+  hosts: localhost
+  gather_facts: False
+  vars:
+    region: "us-east-1"
+    instance_type: "t2.micro"
+    image_id: "ami-080e1f13689e07408" 
+    key_name: "devops"
+    container_name: "petrovich-container"
+    container_image: "nginx"
+
+  tasks:
+    - name: Create EC2 instance
+      ec2_instance:
+        region: "{{ region }}"
+        image:
+          id: "{{ image_id }}"
+        instance_type: "{{ instance_type }}"
+        key_name: "{{ key_name }}"
+        count: 1
+        wait: true
+        tags:
+          Name: "ansible-ec2-petrovich"
+      register: ec2
+
+    - name: Get public IP of new instance
+      set_fact:
+        ip_address_ec2: "{{ ec2.instances[0].public_ip_address }}"
+
+    - name: Pause for 60 seconds before installing Docker
+      pause:
+        seconds: 60
+
+    - name: Install Docker
+      delegate_to: "{{ ip_address_ec2 }}"
+      become: true
+      remote_user: ubuntu
+      environment:
+        ANSIBLE_REMOTE_TMP: /tmp/.ansible/tmp
+      vars:
+        ansible_ssh_private_key_file: /root/ansible/devops.pem
+      shell: "curl -fsSL https://get.docker.com -o get-docker.sh && sh get-docker.sh"
+      timeout: 360  # Увеличиваем время ожидания до 60 секунд
+
+    - name: Start and enable Docker service
+      delegate_to: "{{ ip_address_ec2 }}"
+      become: true
+      remote_user: ubuntu
+      environment:
+        ANSIBLE_REMOTE_TMP: /tmp/.ansible/tmp
+      vars:
+        ansible_ssh_private_key_file: /root/ansible/devops.pem
+      service:
+        name: docker
+        state: started
+        enabled: yes
+
+    - name: Run Docker container
+      delegate_to: "{{ ip_address_ec2 }}"
+      become: true
+      remote_user: ubuntu
+      environment:
+        ANSIBLE_REMOTE_TMP: /tmp/.ansible/tmp
+      vars:
+        ansible_ssh_private_key_file: /root/ansible/devops.pem
+      shell: "docker run -d --name {{ container_name }} {{ container_image }}"
+
+    - name: Remove EC2 instance
+      ec2_instance:
+        region: "{{ region }}"
+        state: absent
+        instance_ids: "{{ ec2.instance_ids }}"
+
+  PLAY [hw17 create ec2, run docker, delete instance] **********************************************************************************************
+
+TASK [Create EC2 instance] ***********************************************************************************************************************
+changed: [localhost]
+
+TASK [Get public IP of new instance] *************************************************************************************************************
+ok: [localhost]
+
+TASK [Pause for 60 seconds before installing Docker] *********************************************************************************************
+Pausing for 60 seconds
+(ctrl+C then 'C' = continue early, ctrl+C then 'A' = abort)
+ok: [localhost]
+
+TASK [Install Docker] ****************************************************************************************************************************
+The authenticity of host '3.85.173.179 (3.85.173.179)' can't be established.
+ED25519 key fingerprint is SHA256:DUiq9f/XQ47vj2eOOgf5t3ftCHCpyVILX6gnGgPI5No.
+This key is not known by any other names
+Are you sure you want to continue connecting (yes/no/[fingerprint])? yes
+changed: [localhost -> 3.85.173.179]
+
+TASK [Start and enable Docker service] ***********************************************************************************************************
+ok: [localhost -> 3.85.173.179]
+
+TASK [Run Docker container] **********************************************************************************************************************
+changed: [localhost -> 3.85.173.179]
+
+TASK [Remove EC2 instance] ***********************************************************************************************************************
+changed: [localhost]
+
+PLAY RECAP ***************************************************************************************************************************************
+localhost                  : ok=7    changed=4    unreachable=0    failed=0    skipped=0    rescued=0    ignored=0
+
