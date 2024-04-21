@@ -1,0 +1,197 @@
+    1. Написать ansible playbook, который развернет tomcat на удаленном сервере с помощью роли. 
+    2. Написать playbook, который перезагрузит удаленный сервер, дождется когда он запустится  и развернет роль которая в пункте 1.
+
+      root@petrovich-slave:~/ansible# ls -R .
+.:
+deploy_restart_tomcat.yml  devops.pem  hosts  id_rsa  roles
+
+./roles:
+geerlingguy.java  tomcat
+
+./roles/geerlingguy.java:
+defaults  LICENSE  meta  molecule  README.md  tasks  templates  vars
+
+./roles/geerlingguy.java/defaults:
+main.yml
+
+./roles/geerlingguy.java/meta:
+main.yml
+
+./roles/geerlingguy.java/molecule:
+default
+
+./roles/geerlingguy.java/molecule/default:
+converge.yml  molecule.yml
+
+./roles/geerlingguy.java/tasks:
+main.yml  setup-Amazon.yml  setup-Debian.yml  setup-FreeBSD.yml  setup-RedHat.yml
+
+./roles/geerlingguy.java/templates:
+java_home.sh.j2
+
+./roles/geerlingguy.java/vars:
+Amazon-2023.yml  Debian-10.yml  Debian-12.yml  Debian-9.yml  FreeBSD.yml   RedHat-8.yml  Ubuntu-12.yml  Ubuntu-16.yml  Ubuntu-20.yml
+Amazon-2.yml     Debian-11.yml  Debian-8.yml   Fedora.yml    RedHat-7.yml  RedHat-9.yml  Ubuntu-14.yml  Ubuntu-18.yml  Ubuntu-22.yml
+
+./roles/tomcat:
+defaults  files  handlers  meta  README.md  tasks  templates  tests  vars
+
+./roles/tomcat/defaults:
+main.yml
+
+./roles/tomcat/files:
+
+./roles/tomcat/handlers:
+main.yml
+
+./roles/tomcat/meta:
+main.yml
+
+./roles/tomcat/tasks:
+main.yml
+
+./roles/tomcat/templates:
+
+./roles/tomcat/tests:
+inventory  test.yml
+
+./roles/tomcat/vars:
+main.yml
+
+root@petrovich-slave:~/ansible/roles/tomcat/tasks# cat main.yml
+---
+# tasks file for tomcat
+- name: Install Java
+  package:
+    name: openjdk-8-jdk
+    state: present
+
+- name: Download and extract Apache Tomcat
+  get_url:
+    url: http://apache.mirrors.pair.com/tomcat/tomcat-9/v9.0.87/bin/apache-tomcat-9.0.87.tar.gz
+    dest: /tmp/apache-tomcat-9.0.87.tar.gz
+
+- name: Extract Apache Tomcat
+  become: yes
+  unarchive:
+    src: /tmp/apache-tomcat-9.0.87.tar.gz
+    dest: /opt
+    remote_src: yes
+
+- name: Set permissions for Tomcat
+  file:
+    path: /opt/apache-tomcat-9.0.87
+    state: directory
+    mode: '0755'
+
+- name: Start Apache Tomcat
+  command: /opt/apache-tomcat-9.0.87/bin/startup.sh
+
+  root@petrovich-slave:~/ansible# cat deploy_restart_tomcat.yml
+- name: Deploy, restart server, and deploy Tomcat
+  hosts: hostname1
+  gather_facts: False
+
+  tasks:
+    - name: Restart remote server
+      become: yes
+      shell: shutdown -r now
+      async: 1
+      poll: 0
+      ignore_errors: yes
+
+    - name: Add delay before checking server availability via ping
+      pause:
+        seconds: 60
+
+    - name: Wait for server to come back online
+      ping:
+
+    - name: Set OS-specific variables
+      setup:
+
+    - name: Include role to deploy Apache Tomcat
+      include_role:
+        name: tomcat
+
+
+  root@petrovich-slave:~/ansible# ansible-playbook -i hosts deploy_restart_tomcat.yml
+
+PLAY [Deploy, restart server, and deploy Tomcat] *************************************************************************************************
+
+TASK [Restart remote server] *********************************************************************************************************************
+changed: [hostname1]
+
+TASK [Add delay before checking server availability via ping] ************************************************************************************
+Pausing for 60 seconds
+(ctrl+C then 'C' = continue early, ctrl+C then 'A' = abort)
+ok: [hostname1]
+
+TASK [Wait for server to come back online] *******************************************************************************************************
+ok: [hostname1]
+
+TASK [Set OS-specific variables] *****************************************************************************************************************
+ok: [hostname1]
+
+TASK [Include role to deploy Apache Tomcat] ******************************************************************************************************
+
+TASK [geerlingguy.java : Include OS-specific variables for Fedora or FreeBSD.] *******************************************************************
+skipping: [hostname1]
+
+TASK [geerlingguy.java : Include OS-specific variables for Amazon.] ******************************************************************************
+skipping: [hostname1]
+
+TASK [geerlingguy.java : Include version-specific variables for CentOS/RHEL.] ********************************************************************
+skipping: [hostname1]
+
+TASK [geerlingguy.java : Include version-specific variables for Ubuntu.] *************************************************************************
+ok: [hostname1]
+
+TASK [geerlingguy.java : Include version-specific variables for Debian.] *************************************************************************
+ok: [hostname1]
+
+TASK [geerlingguy.java : Define java_packages.] **************************************************************************************************
+ok: [hostname1]
+
+TASK [geerlingguy.java : include_tasks] **********************************************************************************************************
+skipping: [hostname1]
+
+TASK [geerlingguy.java : include_tasks] **********************************************************************************************************
+skipping: [hostname1]
+
+TASK [geerlingguy.java : include_tasks] **********************************************************************************************************
+included: /root/ansible/roles/geerlingguy.java/tasks/setup-Debian.yml for hostname1
+
+TASK [geerlingguy.java : Ensure 'man' directory exists.] *****************************************************************************************
+ok: [hostname1]
+
+TASK [geerlingguy.java : Ensure Java is installed.] **********************************************************************************************
+ok: [hostname1]
+
+TASK [geerlingguy.java : include_tasks] **********************************************************************************************************
+skipping: [hostname1]
+
+TASK [geerlingguy.java : Set JAVA_HOME if configured.] *******************************************************************************************
+skipping: [hostname1]
+
+TASK [tomcat : Install Java] *********************************************************************************************************************
+ok: [hostname1]
+
+TASK [tomcat : Download and extract Apache Tomcat] ***********************************************************************************************
+changed: [hostname1]
+
+TASK [tomcat : Extract Apache Tomcat] ************************************************************************************************************
+changed: [hostname1]
+
+TASK [tomcat : Set permissions for Tomcat] *******************************************************************************************************
+ok: [hostname1]
+
+TASK [tomcat : Start Apache Tomcat] **************************************************************************************************************
+changed: [hostname1]
+
+PLAY RECAP ***************************************************************************************************************************************
+hostname1                  : ok=15   changed=4    unreachable=0    failed=0    skipped=7    rescued=0    ignored=0
+
+
+  3. Подготовить терраформ, который создаст eks кластер, в кластере одна node group и один сервер t3.small.
+  
