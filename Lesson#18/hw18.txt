@@ -194,4 +194,285 @@ hostname1                  : ok=15   changed=4    unreachable=0    failed=0    s
 
 
   3. Подготовить терраформ, который создаст eks кластер, в кластере одна node group и один сервер t3.small.
-  
+
+
+module "eks" {
+  source  = "terraform-aws-modules/eks/aws"
+  version = "20.8.5"
+
+  cluster_name    = "my-eks-cluster-petrovich1"
+  cluster_version = "1.29"
+
+  eks_managed_node_groups = {
+    default_nodes_groups = {
+      name           = "node-group-1-petrovich"
+      instance_types = ["t3.small"]
+      min_size       = 1
+      max_size       = 1
+      desired_size   = 1
+      subnets        = [
+        { id = "subnet-0d672b3db5dc0d5ff", map_public_ip_on_launch = true },
+        { id = "subnet-0e744ecb778ad170d", map_public_ip_on_launch = true }
+      ]
+    }
+  }
+
+  enable_efa_support = false
+
+  subnet_ids = ["subnet-0d672b3db5dc0d5ff", "subnet-0e744ecb778ad170d"]
+
+
+Do you want to perform these actions?
+  Terraform will perform the actions described above.
+  Only 'yes' will be accepted to approve.
+
+  Enter a value: yes
+
+module.eks.aws_iam_role_policy_attachment.cluster_encryption[0]: Destroying... [id=my-eks-cluster-petrovich18-cluster-20240421171436572200000003-20240421171459418200000007]
+module.eks.aws_iam_openid_connect_provider.oidc_provider[0]: Destroying... [id=arn:aws:iam::097084951758:oidc-provider/oidc.eks.us-east-1.amazonaws.com/id/FD8CDC19FA80E6EA9D9F36303FF6D021]
+module.eks.module.kms.aws_kms_alias.this["cluster"]: Destroying... [id=alias/eks/my-eks-cluster-petrovich18]
+module.eks.aws_iam_openid_connect_provider.oidc_provider[0]: Destruction complete after 1s
+module.eks.aws_cloudwatch_log_group.this[0]: Creating...
+module.eks.aws_security_group.cluster[0]: Creating...
+module.eks.aws_security_group.node[0]: Creating...
+module.eks.module.kms.aws_kms_alias.this["cluster"]: Destruction complete after 2s
+module.eks.aws_iam_role_policy_attachment.cluster_encryption[0]: Destruction complete after 2s
+module.eks.aws_iam_policy.cluster_encryption[0]: Destroying... [id=arn:aws:iam::097084951758:policy/my-eks-cluster-petrovich18-cluster-ClusterEncryption20240421171457190300000006]
+module.eks.aws_iam_policy.cluster_encryption[0]: Destruction complete after 1s
+module.eks.aws_iam_role.this[0]: Creating...
+module.eks.aws_cloudwatch_log_group.this[0]: Creation complete after 2s [id=/aws/eks/my-eks-cluster-petrovich1/cluster]
+module.eks.aws_iam_role.this[0]: Creation complete after 3s [id=my-eks-cluster-petrovich1-cluster-20240421173257874500000003]
+module.eks.aws_iam_role_policy_attachment.this["AmazonEKSClusterPolicy"]: Creating...
+module.eks.module.kms.data.aws_iam_policy_document.this[0]: Reading...
+module.eks.aws_iam_role_policy_attachment.this["AmazonEKSVPCResourceController"]: Creating...
+module.eks.module.kms.data.aws_iam_policy_document.this[0]: Read complete after 0s [id=3194858897]
+module.eks.module.kms.aws_kms_key.this[0]: Modifying... [id=1bf44470-a409-4c29-a989-c52b4599e977]
+module.eks.aws_iam_role_policy_attachment.this["AmazonEKSClusterPolicy"]: Creation complete after 1s [id=my-eks-cluster-petrovich1-cluster-20240421173257874500000003-20240421173301262100000004]
+module.eks.aws_iam_role_policy_attachment.this["AmazonEKSVPCResourceController"]: Creation complete after 1s [id=my-eks-cluster-petrovich1-cluster-20240421173257874500000003-20240421173301338800000005]
+module.eks.aws_security_group.cluster[0]: Creation complete after 5s [id=sg-0a04315b470f1a4ad]
+module.eks.aws_security_group.node[0]: Creation complete after 5s [id=sg-095d40493108ea425]
+module.eks.aws_security_group_rule.node["ingress_cluster_443"]: Creating...
+module.eks.aws_security_group_rule.node["ingress_cluster_8443_webhook"]: Creating...
+module.eks.aws_security_group_rule.node["ingress_cluster_6443_webhook"]: Creating...
+module.eks.aws_security_group_rule.node["ingress_self_coredns_udp"]: Creating...
+module.eks.aws_security_group_rule.node["ingress_cluster_kubelet"]: Creating...
+module.eks.aws_security_group_rule.cluster["ingress_nodes_443"]: Creating...
+module.eks.aws_security_group_rule.node["egress_all"]: Creating...
+module.eks.aws_security_group_rule.node["ingress_cluster_9443_webhook"]: Creating...
+module.eks.aws_security_group_rule.node["ingress_self_coredns_tcp"]: Creating...
+module.eks.aws_security_group_rule.node["ingress_cluster_443"]: Creation complete after 1s [id=sgrule-73679503]
+module.eks.aws_security_group_rule.node["ingress_cluster_4443_webhook"]: Creating...
+module.eks.aws_security_group_rule.cluster["ingress_nodes_443"]: Creation complete after 1s [id=sgrule-2616094811]
+module.eks.aws_security_group_rule.node["ingress_nodes_ephemeral"]: Creating...
+module.eks.aws_security_group_rule.node["ingress_cluster_8443_webhook"]: Creation complete after 3s [id=sgrule-3944521596]
+module.eks.aws_security_group_rule.node["ingress_cluster_6443_webhook"]: Creation complete after 4s [id=sgrule-4164985693]
+module.eks.aws_security_group_rule.node["ingress_cluster_kubelet"]: Creation complete after 6s [id=sgrule-447384119]
+module.eks.aws_security_group_rule.node["ingress_self_coredns_udp"]: Creation complete after 8s [id=sgrule-4009914084]
+module.eks.module.kms.aws_kms_key.this[0]: Still modifying... [id=1bf44470-a409-4c29-a989-c52b4599e977, 10s elapsed]
+module.eks.aws_security_group_rule.node["egress_all"]: Creation complete after 9s [id=sgrule-3958366721]
+module.eks.aws_security_group_rule.node["ingress_cluster_9443_webhook"]: Still creating... [10s elapsed]
+module.eks.aws_security_group_rule.node["ingress_self_coredns_tcp"]: Still creating... [10s elapsed]
+module.eks.aws_security_group_rule.node["ingress_cluster_4443_webhook"]: Still creating... [10s elapsed]
+module.eks.aws_security_group_rule.node["ingress_self_coredns_tcp"]: Creation complete after 11s [id=sgrule-1264438539]
+module.eks.aws_security_group_rule.node["ingress_nodes_ephemeral"]: Still creating... [10s elapsed]
+module.eks.aws_security_group_rule.node["ingress_cluster_9443_webhook"]: Creation complete after 13s [id=sgrule-2411572407]
+module.eks.aws_security_group_rule.node["ingress_cluster_4443_webhook"]: Creation complete after 13s [id=sgrule-822265035]
+module.eks.aws_security_group_rule.node["ingress_nodes_ephemeral"]: Creation complete after 14s [id=sgrule-3409505842]
+module.eks.module.kms.aws_kms_key.this[0]: Modifications complete after 17s [id=1bf44470-a409-4c29-a989-c52b4599e977]
+module.eks.module.kms.aws_kms_alias.this["cluster"]: Creating...
+module.eks.aws_eks_cluster.this[0]: Creating...
+module.eks.aws_iam_policy.cluster_encryption[0]: Creating...
+module.eks.module.kms.aws_kms_alias.this["cluster"]: Creation complete after 1s [id=alias/eks/my-eks-cluster-petrovich1]
+module.eks.aws_iam_policy.cluster_encryption[0]: Creation complete after 1s [id=arn:aws:iam::097084951758:policy/my-eks-cluster-petrovich1-cluster-ClusterEncryption20240421173318036100000006]
+module.eks.aws_iam_role_policy_attachment.cluster_encryption[0]: Creating...
+module.eks.aws_iam_role_policy_attachment.cluster_encryption[0]: Creation complete after 1s [id=my-eks-cluster-petrovich1-cluster-20240421173257874500000003-20240421173319457900000007]
+module.eks.aws_eks_cluster.this[0]: Still creating... [10s elapsed]
+module.eks.aws_eks_cluster.this[0]: Still creating... [20s elapsed]
+module.eks.aws_eks_cluster.this[0]: Still creating... [30s elapsed]
+module.eks.aws_eks_cluster.this[0]: Still creating... [40s elapsed]
+module.eks.aws_eks_cluster.this[0]: Still creating... [50s elapsed]
+module.eks.aws_eks_cluster.this[0]: Still creating... [1m0s elapsed]
+module.eks.aws_eks_cluster.this[0]: Still creating... [1m10s elapsed]
+module.eks.aws_eks_cluster.this[0]: Still creating... [1m20s elapsed]
+module.eks.aws_eks_cluster.this[0]: Still creating... [1m30s elapsed]
+module.eks.aws_eks_cluster.this[0]: Still creating... [1m40s elapsed]
+module.eks.aws_eks_cluster.this[0]: Still creating... [1m50s elapsed]
+module.eks.aws_eks_cluster.this[0]: Still creating... [2m0s elapsed]
+module.eks.aws_eks_cluster.this[0]: Still creating... [2m10s elapsed]
+module.eks.aws_eks_cluster.this[0]: Still creating... [2m20s elapsed]
+module.eks.aws_eks_cluster.this[0]: Still creating... [2m30s elapsed]
+module.eks.aws_eks_cluster.this[0]: Still creating... [2m40s elapsed]
+module.eks.aws_eks_cluster.this[0]: Still creating... [2m50s elapsed]
+module.eks.aws_eks_cluster.this[0]: Still creating... [3m0s elapsed]
+module.eks.aws_eks_cluster.this[0]: Still creating... [3m10s elapsed]
+module.eks.aws_eks_cluster.this[0]: Still creating... [3m20s elapsed]
+module.eks.aws_eks_cluster.this[0]: Still creating... [3m30s elapsed]
+module.eks.aws_eks_cluster.this[0]: Still creating... [3m40s elapsed]
+module.eks.aws_eks_cluster.this[0]: Still creating... [3m50s elapsed]
+module.eks.aws_eks_cluster.this[0]: Still creating... [4m0s elapsed]
+module.eks.aws_eks_cluster.this[0]: Still creating... [4m10s elapsed]
+module.eks.aws_eks_cluster.this[0]: Still creating... [4m20s elapsed]
+module.eks.aws_eks_cluster.this[0]: Still creating... [4m30s elapsed]
+module.eks.aws_eks_cluster.this[0]: Still creating... [4m40s elapsed]
+module.eks.aws_eks_cluster.this[0]: Still creating... [4m50s elapsed]
+module.eks.aws_eks_cluster.this[0]: Still creating... [5m0s elapsed]
+module.eks.aws_eks_cluster.this[0]: Still creating... [5m10s elapsed]
+module.eks.aws_eks_cluster.this[0]: Still creating... [5m20s elapsed]
+module.eks.aws_eks_cluster.this[0]: Still creating... [5m30s elapsed]
+module.eks.aws_eks_cluster.this[0]: Still creating... [5m40s elapsed]
+module.eks.aws_eks_cluster.this[0]: Still creating... [5m50s elapsed]
+module.eks.aws_eks_cluster.this[0]: Still creating... [6m0s elapsed]
+module.eks.aws_eks_cluster.this[0]: Still creating... [6m10s elapsed]
+module.eks.aws_eks_cluster.this[0]: Still creating... [6m20s elapsed]
+module.eks.aws_eks_cluster.this[0]: Still creating... [6m30s elapsed]
+module.eks.aws_eks_cluster.this[0]: Still creating... [6m40s elapsed]
+module.eks.aws_eks_cluster.this[0]: Still creating... [6m50s elapsed]
+module.eks.aws_eks_cluster.this[0]: Still creating... [7m0s elapsed]
+module.eks.aws_eks_cluster.this[0]: Still creating... [7m11s elapsed]
+module.eks.aws_eks_cluster.this[0]: Still creating... [7m21s elapsed]
+module.eks.aws_eks_cluster.this[0]: Still creating... [7m31s elapsed]
+module.eks.aws_eks_cluster.this[0]: Still creating... [7m41s elapsed]
+module.eks.aws_eks_cluster.this[0]: Still creating... [7m51s elapsed]
+module.eks.aws_eks_cluster.this[0]: Still creating... [8m1s elapsed]
+module.eks.aws_eks_cluster.this[0]: Still creating... [8m11s elapsed]
+module.eks.aws_eks_cluster.this[0]: Still creating... [8m21s elapsed]
+module.eks.aws_eks_cluster.this[0]: Still creating... [8m31s elapsed]
+module.eks.aws_eks_cluster.this[0]: Still creating... [8m41s elapsed]
+module.eks.aws_eks_cluster.this[0]: Still creating... [8m51s elapsed]
+module.eks.aws_eks_cluster.this[0]: Still creating... [9m1s elapsed]
+module.eks.aws_eks_cluster.this[0]: Still creating... [9m11s elapsed]
+module.eks.aws_eks_cluster.this[0]: Still creating... [9m21s elapsed]
+module.eks.aws_eks_cluster.this[0]: Creation complete after 9m27s [id=my-eks-cluster-petrovich1]
+module.eks.data.tls_certificate.this[0]: Reading...
+module.eks.time_sleep.this[0]: Creating...
+module.eks.data.tls_certificate.this[0]: Read complete after 1s [id=5933588ce34e24e9fb40c3565fb0b5993639df67]
+module.eks.aws_iam_openid_connect_provider.oidc_provider[0]: Creating...
+module.eks.aws_iam_openid_connect_provider.oidc_provider[0]: Creation complete after 2s [id=arn:aws:iam::097084951758:oidc-provider/oidc.eks.us-east-1.amazonaws.com/id/319712A15FC1B68FF988D8C1D73B62B1]
+module.eks.time_sleep.this[0]: Still creating... [10s elapsed]
+module.eks.time_sleep.this[0]: Still creating... [20s elapsed]
+module.eks.time_sleep.this[0]: Still creating... [30s elapsed]
+module.eks.time_sleep.this[0]: Creation complete after 30s [id=2024-04-21T17:43:15Z]
+module.eks.module.eks_managed_node_group["default_nodes_groups"].aws_launch_template.this[0]: Modifying... [id=lt-09f9a3a50aa90adc1]
+module.eks.module.eks_managed_node_group["default_nodes_groups"].aws_launch_template.this[0]: Modifications complete after 3s [id=lt-09f9a3a50aa90adc1]
+module.eks.module.eks_managed_node_group["default_nodes_groups"].aws_eks_node_group.this[0]: Creating...
+module.eks.module.eks_managed_node_group["default_nodes_groups"].aws_eks_node_group.this[0]: Still creating... [10s elapsed]
+module.eks.module.eks_managed_node_group["default_nodes_groups"].aws_eks_node_group.this[0]: Still creating... [20s elapsed]
+module.eks.module.eks_managed_node_group["default_nodes_groups"].aws_eks_node_group.this[0]: Still creating... [30s elapsed]
+module.eks.module.eks_managed_node_group["default_nodes_groups"].aws_eks_node_group.this[0]: Still creating... [40s elapsed]
+module.eks.module.eks_managed_node_group["default_nodes_groups"].aws_eks_node_group.this[0]: Still creating... [50s elapsed]
+module.eks.module.eks_managed_node_group["default_nodes_groups"].aws_eks_node_group.this[0]: Still creating... [1m0s elapsed]
+module.eks.module.eks_managed_node_group["default_nodes_groups"].aws_eks_node_group.this[0]: Still creating... [1m10s elapsed]
+module.eks.module.eks_managed_node_group["default_nodes_groups"].aws_eks_node_group.this[0]: Still creating... [1m20s elapsed]
+module.eks.module.eks_managed_node_group["default_nodes_groups"].aws_eks_node_group.this[0]: Still creating... [1m30s elapsed]
+module.eks.module.eks_managed_node_group["default_nodes_groups"].aws_eks_node_group.this[0]: Still creating... [1m40s elapsed]
+module.eks.module.eks_managed_node_group["default_nodes_groups"].aws_eks_node_group.this[0]: Still creating... [1m50s elapsed]
+module.eks.module.eks_managed_node_group["default_nodes_groups"].aws_eks_node_group.this[0]: Still creating... [2m0s elapsed]
+module.eks.module.eks_managed_node_group["default_nodes_groups"].aws_eks_node_group.this[0]: Still creating... [2m10s elapsed]
+module.eks.module.eks_managed_node_group["default_nodes_groups"].aws_eks_node_group.this[0]: Still creating... [2m20s elapsed]
+module.eks.module.eks_managed_node_group["default_nodes_groups"].aws_eks_node_group.this[0]: Still creating... [2m30s elapsed]
+module.eks.module.eks_managed_node_group["default_nodes_groups"].aws_eks_node_group.this[0]: Still creating... [2m40s elapsed]
+module.eks.module.eks_managed_node_group["default_nodes_groups"].aws_eks_node_group.this[0]: Still creating... [2m50s elapsed]
+module.eks.module.eks_managed_node_group["default_nodes_groups"].aws_eks_node_group.this[0]: Creation complete after 2m56s [id=my-eks-cluster-petrovich1:node-group-1-petrovich-20240421174318115300000009]
+module.eks.time_sleep.this[0] (deposed object 6309f34e): Destroying... [id=2024-04-21T17:25:13Z]
+module.eks.time_sleep.this[0] (deposed object 2a1795e8): Destroying... [id=2024-04-21T17:01:22Z]
+module.eks.time_sleep.this[0]: Destruction complete after 0s
+module.eks.aws_eks_cluster.this[0] (deposed object ceac05b0): Destroying... [id=my-eks-cluster-petrovich18]
+module.eks.aws_eks_cluster.this[0]: Destruction complete after 9s
+module.eks.aws_cloudwatch_log_group.this[0] (deposed object 83c63ca8): Destroying... [id=/aws/eks/my-eks-cluster-petrovich/cluster]
+module.eks.aws_security_group_rule.node["ingress_self_coredns_tcp"] (deposed object ee8a1272): Destroying... [id=sgrule-1836961896]
+module.eks.aws_security_group_rule.node["egress_all"] (deposed object 50050fa8): Destroying... [id=sgrule-825601923]
+module.eks.aws_security_group_rule.node["ingress_self_coredns_udp"] (deposed object 18f0768a): Destroying... [id=sgrule-3374478215]
+module.eks.aws_security_group_rule.node["ingress_cluster_9443_webhook"] (deposed object b6127bd7): Destroying... [id=sgrule-3291828837]
+module.eks.aws_security_group_rule.node["ingress_nodes_ephemeral"] (deposed object 65323455): Destroying... [id=sgrule-864590505]
+module.eks.aws_security_group_rule.node["ingress_nodes_ephemeral"] (deposed object 4c6339e2): Destroying... [id=sgrule-2760478255]
+module.eks.aws_security_group_rule.node["ingress_cluster_6443_webhook"] (deposed object 424d617f): Destroying... [id=sgrule-4130912487]
+module.eks.aws_iam_role_policy_attachment.this["AmazonEKSClusterPolicy"] (deposed object a9639dcc): Destroying... [id=my-eks-cluster-cluster-20240420123434213700000003-20240420123437774700000009]
+module.eks.aws_security_group_rule.node["ingress_cluster_8443_webhook"] (deposed object 39bd0a81): Destroying... [id=sgrule-3596340022]
+module.eks.aws_cloudwatch_log_group.this[0]: Destruction complete after 1s
+module.eks.aws_security_group_rule.node["ingress_self_coredns_udp"] (deposed object b0d3f51c): Destroying... [id=sgrule-3826008790]
+module.eks.aws_iam_role_policy_attachment.this["AmazonEKSClusterPolicy"]: Destruction complete after 1s
+module.eks.aws_security_group_rule.node["ingress_cluster_4443_webhook"] (deposed object f57ca99a): Destroying... [id=sgrule-1065017201]
+module.eks.time_sleep.this[0]: Still destroying... [id=2024-04-21T17:25:13Z, 10s elapsed]
+module.eks.aws_security_group_rule.node["ingress_self_coredns_tcp"]: Destruction complete after 2s
+module.eks.aws_iam_role_policy_attachment.this["AmazonEKSClusterPolicy"] (deposed object 6f42ffbd): Destroying... [id=my-eks-cluster-petrovich-cluster-20240421164847490700000003-20240421164851963800000005]
+module.eks.aws_security_group_rule.node["ingress_cluster_8443_webhook"]: Destruction complete after 2s
+module.eks.aws_security_group_rule.node["ingress_cluster_kubelet"] (deposed object d899c6eb): Destroying... [id=sgrule-1771995976]
+module.eks.aws_security_group_rule.node["ingress_cluster_9443_webhook"]: Destruction complete after 3s
+module.eks.aws_iam_role_policy_attachment.this["AmazonEKSClusterPolicy"]: Destruction complete after 1s
+module.eks.aws_iam_role_policy_attachment.this["AmazonEKSClusterPolicy"] (deposed object 318338b9): Destroying... [id=my-eks-cluster-petrovich18-cluster-20240421171436572200000003-20240421171440110100000005]
+module.eks.aws_security_group_rule.node["egress_all"] (deposed object 5968358c): Destroying... [id=sgrule-994603844]
+module.eks.aws_iam_role_policy_attachment.this["AmazonEKSClusterPolicy"]: Destruction complete after 0s
+module.eks.aws_cloudwatch_log_group.this[0] (deposed object 4970c565): Destroying... [id=/aws/eks/my-eks-cluster-petrovich18/cluster]
+module.eks.aws_security_group_rule.node["ingress_self_coredns_udp"]: Destruction complete after 2s
+module.eks.aws_security_group_rule.node["ingress_nodes_ephemeral"] (deposed object 794ace67): Destroying... [id=sgrule-582134530]
+module.eks.aws_cloudwatch_log_group.this[0]: Destruction complete after 1s
+module.eks.aws_security_group_rule.node["ingress_self_coredns_tcp"] (deposed object 9bca6de7): Destroying... [id=sgrule-1079238969]
+module.eks.aws_security_group_rule.node["egress_all"]: Destruction complete after 1s
+module.eks.aws_security_group_rule.cluster["ingress_nodes_443"] (deposed object 195c1b2e): Destroying... [id=sgrule-855495920]
+module.eks.aws_security_group_rule.node["ingress_nodes_ephemeral"]: Destruction complete after 1s
+module.eks.aws_security_group_rule.node["ingress_cluster_443"] (deposed object 165ec104): Destroying... [id=sgrule-2047608594]
+module.eks.aws_security_group_rule.node["ingress_cluster_kubelet"] (deposed object b965b132): Destroying... [id=sgrule-2590988438]
+module.eks.aws_security_group_rule.cluster["ingress_nodes_443"]: Destruction complete after 1s
+module.eks.aws_security_group_rule.node["ingress_self_coredns_udp"] (deposed object 75df8add): Destroying... [id=sgrule-2711845640]
+module.eks.aws_security_group_rule.node["ingress_self_coredns_udp"]: Destruction complete after 1s
+module.eks.aws_security_group_rule.node["ingress_cluster_4443_webhook"] (deposed object 238e1a5a): Destroying... [id=sgrule-2055879193]
+module.eks.aws_cloudwatch_log_group.this[0] (deposed object 626e222a): Destroying... [id=/aws/eks/my-eks-cluster/cluster]
+module.eks.aws_cloudwatch_log_group.this[0]: Destruction complete after 0s
+module.eks.aws_iam_role_policy_attachment.this["AmazonEKSVPCResourceController"] (deposed object 6436f05c): Destroying... [id=my-eks-cluster-petrovich-cluster-20240421164847490700000003-20240421164850593100000004]
+module.eks.aws_iam_role_policy_attachment.this["AmazonEKSVPCResourceController"]: Destruction complete after 0s
+module.eks.aws_security_group_rule.node["ingress_cluster_4443_webhook"] (deposed object d87d993c): Destroying... [id=sgrule-205885569]
+module.eks.aws_security_group_rule.node["ingress_cluster_443"]: Destruction complete after 2s
+module.eks.aws_security_group_rule.node["ingress_cluster_6443_webhook"] (deposed object fa1c57a0): Destroying... [id=sgrule-3016252815]
+module.eks.aws_security_group_rule.node["ingress_cluster_kubelet"]: Destruction complete after 1s
+module.eks.aws_security_group_rule.cluster["ingress_nodes_443"] (deposed object 75de5ffd): Destroying... [id=sgrule-678077752]
+module.eks.aws_security_group_rule.node["egress_all"] (deposed object da1274a6): Destroying... [id=sgrule-469103936]
+module.eks.aws_security_group_rule.node["ingress_cluster_6443_webhook"]: Destruction complete after 1s
+module.eks.aws_iam_role_policy_attachment.this["AmazonEKSVPCResourceController"] (deposed object 182c96df): Destroying... [id=my-eks-cluster-petrovich18-cluster-20240421171436572200000003-20240421171439907300000004]
+module.eks.aws_security_group_rule.node["ingress_cluster_kubelet"] (deposed object ab395df6): Destroying... [id=sgrule-2200235640]
+module.eks.aws_security_group_rule.node["ingress_self_coredns_tcp"]: Destruction complete after 4s
+module.eks.aws_security_group_rule.node["ingress_self_coredns_tcp"] (deposed object b22ebf53): Destroying... [id=sgrule-100456679]
+module.eks.aws_security_group_rule.cluster["ingress_nodes_443"]: Destruction complete after 1s
+module.eks.aws_security_group_rule.node["ingress_cluster_8443_webhook"] (deposed object 6aaffa27): Destroying... [id=sgrule-3848570054]
+module.eks.aws_iam_role_policy_attachment.this["AmazonEKSVPCResourceController"]: Destruction complete after 1s
+module.eks.aws_security_group_rule.cluster["ingress_nodes_443"] (deposed object 7862be8b): Destroying... [id=sgrule-1916343216]
+module.eks.aws_security_group_rule.node["ingress_cluster_4443_webhook"]: Destruction complete after 2s
+module.eks.aws_security_group_rule.node["ingress_cluster_9443_webhook"] (deposed object 7ac553bd): Destroying... [id=sgrule-2177218317]
+module.eks.aws_security_group_rule.node["ingress_cluster_443"] (deposed object da415d43): Destroying... [id=sgrule-288218692]
+module.eks.aws_security_group_rule.node["ingress_cluster_8443_webhook"] (deposed object 06683714): Destroying... [id=sgrule-2694078894]
+module.eks.aws_security_group_rule.cluster["ingress_nodes_443"]: Destruction complete after 1s
+module.eks.aws_security_group_rule.node["ingress_cluster_6443_webhook"] (deposed object b84fb3bb): Destroying... [id=sgrule-3305633559]
+module.eks.aws_security_group_rule.node["ingress_cluster_6443_webhook"]: Still destroying... [id=sgrule-4130912487, 10s elapsed]
+module.eks.aws_security_group_rule.node["egress_all"]: Still destroying... [id=sgrule-825601923, 10s elapsed]
+module.eks.aws_security_group_rule.node["ingress_self_coredns_udp"]: Still destroying... [id=sgrule-3374478215, 10s elapsed]
+module.eks.aws_security_group_rule.node["ingress_nodes_ephemeral"]: Still destroying... [id=sgrule-2760478255, 10s elapsed]
+module.eks.aws_security_group_rule.node["ingress_nodes_ephemeral"]: Still destroying... [id=sgrule-864590505, 10s elapsed]
+module.eks.aws_security_group_rule.node["ingress_cluster_kubelet"]: Destruction complete after 2s
+module.eks.aws_security_group_rule.node["ingress_cluster_9443_webhook"] (deposed object d34cc919): Destroying... [id=sgrule-3002792189]
+module.eks.aws_security_group_rule.node["ingress_cluster_6443_webhook"]: Destruction complete after 1s
+module.eks.aws_security_group_rule.node["ingress_cluster_443"] (deposed object dfeb4105): Destroying... [id=sgrule-2585577655]
+module.eks.aws_iam_role_policy_attachment.this["AmazonEKSVPCResourceController"] (deposed object 7e66c3f3): Destroying... [id=my-eks-cluster-cluster-20240420123434213700000003-20240420123437639900000008]
+module.eks.aws_iam_role_policy_attachment.this["AmazonEKSVPCResourceController"]: Destruction complete after 1s
+module.eks.aws_iam_role.this[0] (deposed object 77861739): Destroying... [id=my-eks-cluster-petrovich18-cluster-20240421171436572200000003]
+module.eks.aws_security_group_rule.node["ingress_cluster_4443_webhook"]: Still destroying... [id=sgrule-1065017201, 10s elapsed]
+module.eks.time_sleep.this[0]: Still destroying... [id=2024-04-21T17:25:13Z, 20s elapsed]
+module.eks.aws_security_group_rule.node["ingress_cluster_8443_webhook"]: Destruction complete after 2s
+module.eks.aws_iam_role.this[0] (deposed object ed749147): Destroying... [id=my-eks-cluster-petrovich-cluster-20240421164847490700000003]
+module.eks.aws_security_group_rule.node["egress_all"]: Destruction complete after 4s
+module.eks.aws_iam_role.this[0] (deposed object 07f0a4b8): Destroying... [id=my-eks-cluster-cluster-20240420123434213700000003]
+module.eks.aws_security_group_rule.node["ingress_self_coredns_tcp"]: Destruction complete after 3s
+module.eks.aws_security_group_rule.node["ingress_cluster_kubelet"]: Still destroying... [id=sgrule-1771995976, 10s elapsed]
+module.eks.aws_security_group_rule.node["ingress_cluster_9443_webhook"]: Destruction complete after 2s
+module.eks.aws_security_group_rule.node["ingress_cluster_443"]: Destruction complete after 2s
+module.eks.aws_iam_role.this[0]: Destruction complete after 3s
+module.eks.aws_security_group.cluster[0] (deposed object 485f2fd9): Destroying... [id=sg-02c7c42bfad98fc8c]
+module.eks.aws_security_group.cluster[0] (deposed object bab68478): Destroying... [id=sg-08a436a85018e81a2]
+module.eks.aws_security_group.node[0] (deposed object d28a8c8b): Destroying... [id=sg-02de91858568bb1bf]
+module.eks.aws_security_group.node[0] (deposed object c6214201): Destroying... [id=sg-07258d567241bc739]
+module.eks.aws_security_group.node[0] (deposed object 9949a479): Destroying... [id=sg-02c7c3cbb025c5649]
+module.eks.aws_security_group.cluster[0] (deposed object d66b8364): Destroying... [id=sg-0f5fd2195cc774114]
+module.eks.aws_security_group_rule.node["ingress_cluster_4443_webhook"]: Still destroying... [id=sgrule-2055879193, 10s elapsed]
+module.eks.aws_security_group.node[0]: Destruction complete after 2s
+module.eks.aws_security_group.cluster[0]: Destruction complete after 2s
+
+Apply complete! Resources: 24 added, 2 changed, 40 destroyed.
+
