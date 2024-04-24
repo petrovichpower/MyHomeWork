@@ -715,8 +715,7 @@ C:\mongo>kubectl get pods
 NAME      READY   STATUS    RESTARTS   AGE
 mongo-0   1/1     Running   0          15s
 
-
-
-
-    
     2. Подключить кластер к Lens.
+
+
+![Иллюстрация к проекту](https://github.com/petrovichpower/MyHomeWork/raw/main/Lesson#19(Kubernetes)/Снимок экрана 2024-04-24 142112.png)
