@@ -718,4 +718,4 @@ mongo-0   1/1     Running   0          15s
     2. Подключить кластер к Lens.
 
 
-![Alt scr](https://github.com/petrovichpower/MyHomeWork/raw/main/Lesson%2319(Kubernetes)/Снимок%20экрана%2024-04-24%20142112.png)
+![Alt scr](https://github.com/petrovichpower/MyHomeWork/raw/main/Lesson#19(Kubernetes)/"Снимок экрана 2024-04-24 142112.png")
