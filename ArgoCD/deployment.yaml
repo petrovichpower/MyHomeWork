@@ -14,6 +14,6 @@ spec:
     spec:
       containers:
       - name: php-deployment
-        image: petrovichpower/php-page
+        image: petrovichpower/php-page:new-tag
         ports:
         - containerPort: 80
